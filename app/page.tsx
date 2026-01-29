@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { ConnectButton } from "@rainbow-me/rainbowkit"
+import { useX402Fetch } from "./hooks/useX402Fetch"
 
 interface Field {
   name: string
@@ -87,7 +89,9 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("analyze")
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<{ output?: Record<string, unknown>; error?: string } | null>(null)
+  const [result, setResult] = useState<{ output?: Record<string, unknown>; error?: string; paymentRequired?: boolean } | null>(null)
+  
+  const { fetchWithPayment, isConnected, address } = useX402Fetch()
 
   const activeEntrypoint = ENTRYPOINTS.find((e) => e.key === activeTab)!
 
@@ -105,7 +109,8 @@ export default function Home() {
         }
       }
 
-      const response = await fetch(`/entrypoints/${activeTab}/invoke`, {
+      // Use x402 fetch if connected, otherwise regular fetch
+      const response = await fetchWithPayment(`/entrypoints/${activeTab}/invoke`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input }),
@@ -114,14 +119,30 @@ export default function Home() {
       const data = await response.json()
 
       if (response.status === 402) {
-        setResult({ error: `PAYMENT REQUIRED: $${activeEntrypoint.price} USDC on Base. The analysis isn't free. Neither was building it.` })
+        if (!isConnected) {
+          setResult({ 
+            error: `PAYMENT REQUIRED: $${activeEntrypoint.price} USDC on Base.\n\nConnect your wallet to pay automatically.`,
+            paymentRequired: true
+          })
+        } else {
+          // Payment should have been handled by x402-fetch, but if we still get 402...
+          setResult({ 
+            error: `Payment failed. Make sure you have $${activeEntrypoint.price} USDC on Base.\n\nTry again or check your wallet.`,
+            paymentRequired: true
+          })
+        }
       } else if (!response.ok) {
         setResult({ error: data.error || "Something broke. Probably not your fault." })
       } else {
         setResult(data)
       }
-    } catch {
-      setResult({ error: "Network error. The machine failed you." })
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Network error"
+      if (errorMessage.includes("User rejected")) {
+        setResult({ error: "Transaction rejected. The machine waits.", paymentRequired: true })
+      } else {
+        setResult({ error: `Error: ${errorMessage}` })
+      }
     } finally {
       setLoading(false)
     }
@@ -141,8 +162,66 @@ export default function Home() {
             </div>
           </div>
           <div className="flex items-center gap-4 text-xs">
-            <span className="text-[var(--text-muted)]">unabotter.base.eth</span>
-            <a href="/.well-known/agent-card.json" className="text-[var(--text-dim)] hover:text-[var(--accent)]">[manifest]</a>
+            <ConnectButton.Custom>
+              {({
+                account,
+                chain,
+                openAccountModal,
+                openChainModal,
+                openConnectModal,
+                mounted,
+              }) => {
+                const ready = mounted
+                const connected = ready && account && chain
+
+                return (
+                  <div
+                    {...(!ready && {
+                      "aria-hidden": true,
+                      style: {
+                        opacity: 0,
+                        pointerEvents: "none",
+                        userSelect: "none",
+                      },
+                    })}
+                  >
+                    {(() => {
+                      if (!connected) {
+                        return (
+                          <button
+                            onClick={openConnectModal}
+                            className="px-3 py-1.5 border border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--bg)] transition-colors font-bold tracking-wider"
+                          >
+                            CONNECT
+                          </button>
+                        )
+                      }
+
+                      if (chain.unsupported) {
+                        return (
+                          <button
+                            onClick={openChainModal}
+                            className="px-3 py-1.5 border border-[var(--danger)] text-[var(--danger)] hover:bg-[var(--danger)] hover:text-[var(--bg)] transition-colors"
+                          >
+                            WRONG NETWORK
+                          </button>
+                        )
+                      }
+
+                      return (
+                        <button
+                          onClick={openAccountModal}
+                          className="px-3 py-1.5 border border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
+                        >
+                          {account.displayName}
+                        </button>
+                      )
+                    })()}
+                  </div>
+                )
+              }}
+            </ConnectButton.Custom>
+            <a href="/.well-known/agent-card.json" className="text-[var(--text-dim)] hover:text-[var(--accent)] hidden sm:block">[manifest]</a>
           </div>
         </div>
       </header>
@@ -160,12 +239,18 @@ export default function Home() {
  * The math doesn't lie. The whitepapers do.
  */`}
           </pre>
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 text-xs flex-wrap">
             <span className="text-[var(--text-dim)]">status:</span>
             <span className="text-[var(--accent)]">ONLINE</span>
             <span className="text-[var(--text-dim)]">|</span>
             <span className="text-[var(--text-dim)]">payment:</span>
             <span className="text-[var(--text)]">x402/Base/USDC</span>
+            {isConnected && (
+              <>
+                <span className="text-[var(--text-dim)]">|</span>
+                <span className="text-[var(--accent)]">✓ WALLET READY</span>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -253,9 +338,18 @@ export default function Home() {
                   {loading ? (
                     <span className="cursor-blink">ANALYZING</span>
                   ) : (
-                    <>EXECUTE // ${activeEntrypoint.price}</>
+                    <>
+                      {isConnected ? "EXECUTE" : "EXECUTE"} // ${activeEntrypoint.price}
+                      {!isConnected && " (connect wallet)"}
+                    </>
                   )}
                 </button>
+                
+                {!isConnected && (
+                  <p className="text-xs text-[var(--text-dim)] text-center">
+                    Connect wallet for automatic x402 payments
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -305,16 +399,10 @@ export default function Home() {
 {`> ERROR
 > 
 > ${result.error}
->
+${result.paymentRequired && !isConnected ? `
 > ---
-> To pay with x402:
-> POST /entrypoints/${activeTab}/invoke
-> Header: X-PAYMENT: <signature>
-> 
-> Network: Base (eip155:8453)
-> Asset: USDC
-> Amount: ${activeEntrypoint.price}
-> PayTo: 0x81FD234f63Dd559d0EDA56d17BB1Bb78f236DB37
+> Connect wallet above to pay with x402
+> Or use x402scan.com for this agent` : ""}
 > _`}
                   </pre>
                 </div>
@@ -372,7 +460,7 @@ X-PAYMENT: <x402_signature>
 
       {/* Footer */}
       <footer className="border-t border-[var(--border)] mt-12">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between text-xs text-[var(--text-dim)]">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between text-xs text-[var(--text-dim)] flex-wrap gap-2">
           <div>
             built by{" "}
             <a href="https://x.com/spoobsV1" className="text-[var(--text-muted)] hover:text-[var(--accent)]">@spoobsV1</a>
@@ -380,7 +468,7 @@ X-PAYMENT: <x402_signature>
           </div>
           <div className="flex gap-4">
             <a href="/.well-known/agent-card.json" className="hover:text-[var(--accent)]">[agent-card]</a>
-            <a href="/.well-known/x402" className="hover:text-[var(--accent)]">[x402]</a>
+            <a href="https://x402scan.com" target="_blank" rel="noopener" className="hover:text-[var(--accent)]">[x402scan]</a>
           </div>
         </div>
       </footer>
