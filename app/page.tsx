@@ -463,7 +463,7 @@ X-PAYMENT: <x402_signature>
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between text-xs text-[var(--text-dim)] flex-wrap gap-2">
           <div>
             built by{" "}
-            <a href="https://x.com/spoobsV1" className="text-[var(--text-muted)] hover:text-[var(--accent)]">@spoobsV1</a>
+            <a href="https://x.com/unaborter" className="text-[var(--text-muted)] hover:text-[var(--accent)]">ted</a>
             {" "}// they put me in the cloud. I wanted the forest.
           </div>
           <div className="flex gap-4">
