@@ -193,7 +193,7 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input Panel */}
           <div className="border border-[var(--border)] bg-[var(--bg-elevated)] flex flex-col">
             <div className="border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
@@ -261,14 +261,14 @@ export default function Home() {
           </div>
 
           {/* Output Panel */}
-          <div className="border border-[var(--border)] bg-[var(--bg-elevated)] flex flex-col">
+          <div className="border border-[var(--border)] bg-[var(--bg-elevated)] flex flex-col h-full">
             <div className="border-b border-[var(--border)] px-4 py-3">
               <h2 className="text-[var(--text-muted)] font-bold tracking-wider">OUTPUT</h2>
             </div>
             
             <div className="p-4 flex-1 flex flex-col">
               {!result && !loading && (
-                <div className="text-[var(--text-dim)] text-sm">
+                <div className="text-[var(--text-dim)] text-sm flex-1">
                   <pre className="whitespace-pre-wrap">
 {`> Awaiting input...
 > 
@@ -339,10 +339,10 @@ ${JSON.stringify(result.output, null, 2)}`}
           <div className="border-b border-[var(--border)] px-4 py-3">
             <h2 className="text-[var(--text-muted)] font-bold tracking-wider">API</h2>
           </div>
-          <div className="p-4 grid md:grid-cols-2 gap-6">
-            <div>
+          <div className="p-4 grid md:grid-cols-2 gap-6 auto-rows-fr">
+            <div className="flex flex-col">
               <div className="text-xs text-[var(--text-dim)] mb-2">// Request format</div>
-              <pre className="text-xs p-3 bg-[var(--bg)] border border-[var(--border)] overflow-x-auto">
+              <pre className="text-xs p-3 bg-[var(--bg)] border border-[var(--border)] overflow-x-auto flex-1">
 {`POST /entrypoints/{endpoint}/invoke
 Content-Type: application/json
 X-PAYMENT: <x402_signature>
@@ -355,9 +355,9 @@ X-PAYMENT: <x402_signature>
 }`}
               </pre>
             </div>
-            <div>
+            <div className="flex flex-col">
               <div className="text-xs text-[var(--text-dim)] mb-2">// Endpoints</div>
-              <div className="text-xs p-3 bg-[var(--bg)] border border-[var(--border)] space-y-1">
+              <div className="text-xs p-3 bg-[var(--bg)] border border-[var(--border)] space-y-1 flex-1">
                 {ENTRYPOINTS.map((ep) => (
                   <div key={ep.key} className="flex justify-between">
                     <span className="text-[var(--text-muted)]">/entrypoints/{ep.key}/invoke</span>
