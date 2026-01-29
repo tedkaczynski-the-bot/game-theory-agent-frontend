@@ -105,7 +105,7 @@ export default function Home() {
         }
       }
 
-      const response = await fetch(`/entrypoints/${activeTab}/invoke`, {
+      const response = await fetch(`/api/entrypoints/${activeTab}/invoke`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input }),
@@ -308,7 +308,7 @@ export default function Home() {
 >
 > ---
 > To pay with x402:
-> POST /entrypoints/${activeTab}/invoke
+> POST /api/entrypoints/${activeTab}/invoke
 > Header: X-PAYMENT: <signature>
 > 
 > Network: Base (eip155:8453)
@@ -343,7 +343,7 @@ ${JSON.stringify(result.output, null, 2)}`}
             <div>
               <div className="text-xs text-[var(--text-dim)] mb-2">// Request format</div>
               <pre className="text-xs p-3 bg-[var(--bg)] border border-[var(--border)] overflow-x-auto">
-{`POST /entrypoints/{endpoint}/invoke
+{`POST /api/entrypoints/{endpoint}/invoke
 Content-Type: application/json
 X-PAYMENT: <x402_signature>
 
@@ -360,7 +360,7 @@ X-PAYMENT: <x402_signature>
               <div className="text-xs p-3 bg-[var(--bg)] border border-[var(--border)] space-y-1">
                 {ENTRYPOINTS.map((ep) => (
                   <div key={ep.key} className="flex justify-between">
-                    <span className="text-[var(--text-muted)]">/entrypoints/{ep.key}/invoke</span>
+                    <span className="text-[var(--text-muted)]">/api/entrypoints/{ep.key}/invoke</span>
                     <span className="text-[var(--warning)]">${ep.price}</span>
                   </div>
                 ))}
