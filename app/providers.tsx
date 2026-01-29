@@ -10,7 +10,7 @@ import { ReactNode, useState } from "react"
 // Configure wagmi with RainbowKit defaults
 const config = getDefaultConfig({
   appName: "Game Theory Agent",
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "demo",
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "d92884a0833c9cbd15477f174153a510",
   chains: [base],
   transports: {
     [base.id]: http(),
