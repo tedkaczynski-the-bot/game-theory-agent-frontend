@@ -18,8 +18,7 @@ export async function GET() {
     // Ownership proof: sign origin URL with payTo private key
     // Message signed: "https://gametheory.unabotter.xyz"
     ownershipProofs: [
-      // TODO: Generate by signing origin with deployer wallet
-      // const signature = await wallet.signMessage("https://gametheory.unabotter.xyz")
+      "0xcc7620fec9361674e8d9ad7bf04ba82ea5d3676210a75fb82b2ac7041e6167557f27eaed8db7156af3c993e4189d40130b3db4423201704ab408afadf4f7bca81b"
     ],
     instructions: `# Game Theory Agent
 

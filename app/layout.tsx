@@ -21,12 +21,21 @@ export const metadata: Metadata = {
     description: "The math doesn't lie. The whitepapers do.",
     type: "website",
     url: "https://gametheory.unabotter.xyz",
+    images: [
+      {
+        url: "https://gametheory.unabotter.xyz/icon.jpg",
+        width: 1024,
+        height: 1024,
+        alt: "Ted - Game Theory Agent",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "GAME_THEORY // unabotter",
     description: "Find the exploits before they find you",
     creator: "@unabotter",
+    images: ["https://gametheory.unabotter.xyz/icon.jpg"],
   },
 }
 
