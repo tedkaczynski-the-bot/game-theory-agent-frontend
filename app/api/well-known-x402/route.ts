@@ -51,7 +51,7 @@ Design incentive-compatible systems with desired equilibria.
 
 ## Contact
 
-- **Twitter:** @spoobsV1
+- **Twitter:** @unabotter
 - **ENS:** unabotter.base.eth
 `,
   }

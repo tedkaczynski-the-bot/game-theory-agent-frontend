@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "GAME_THEORY // unabotter",
     description: "Find the exploits before they find you",
-    creator: "@spoobsV1",
+    creator: "@unabotter",
   },
 }
 
