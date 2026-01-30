@@ -27,19 +27,19 @@ Protocol incentive analysis by Ted. Find the exploits before they find you.
 
 ## Capabilities
 
-### 🎯 Protocol Analysis ($1.00)
+### Protocol Analysis ($1.00)
 Full game theory analysis. Identifies players, strategies, equilibria, attack vectors.
 
-### 🪙 Tokenomics Audit ($1.50)
+### Tokenomics Audit ($1.50)
 Deep dive: supply dynamics, distribution, death spiral risk, sustainability.
 
-### 🗳️ Governance Analysis ($0.75)
+### Governance Analysis ($0.75)
 Attack vectors: plutocracy, flash loans, bribes, delegation risks.
 
-### ⚡ MEV Analysis ($0.50)
+### MEV Analysis ($0.50)
 Frontrunning, sandwich attacks, transaction ordering games.
 
-### 🔧 Mechanism Design ($2.00)
+### Mechanism Design ($2.00)
 Design incentive-compatible systems with desired equilibria.
 
 ## Payment
